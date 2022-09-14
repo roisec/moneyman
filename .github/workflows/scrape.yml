@@ -8,12 +8,12 @@ on:
         required: false
         description: "Accounts to scrape (comma separated)"
       daysBack:
-        default: "10"
-        required: false
+        default: "15"
+        required: yes
         description: "Days back to scrape"
       worksheetName:
-        default: "test"
-        required: false
+        default: "_caspion"
+        required: yes
         description: "The name of the worksheet to write to"
   schedule:
     - cron: "33 10 * * */2"
