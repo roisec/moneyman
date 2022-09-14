@@ -12,7 +12,7 @@ on:
         required: false
         description: "Days back to scrape"
       worksheetName:
-        default: "auto_moneyman"
+        default: "test"
         required: false
         description: "The name of the worksheet to write to"
   schedule:
