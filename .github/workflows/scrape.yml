@@ -50,7 +50,7 @@ jobs:
           DEBUG: ""
           TZ: "Asia/Jerusalem"
           DAYS_BACK: ${{ github.event.inputs.daysBack }}
-          WORKSHEET_NAME: ${{ github.event.inputs.worksheetName }}
+          WORKSHEET_NAME: ${{ secrets.WORKSHEET_NAME }}
           ACCOUNTS_TO_SCRAPE: ${{ github.event.inputs.accountsToScrape }}
           ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
           TELEGRAM_API_KEY: ${{ secrets.TELEGRAM_API_KEY }}
