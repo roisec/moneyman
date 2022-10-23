@@ -8,7 +8,7 @@ on:
         required: false
         description: "Accounts to scrape (comma separated)"
       daysBack:
-        default: "10"
+        default: "12"
         required: yes
         description: "Days back to scrape"
       worksheetName:
