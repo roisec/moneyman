@@ -9,7 +9,7 @@ const {
   ACCOUNTS_JSON,
   TELEGRAM_API_KEY = "",
   TELEGRAM_CHAT_ID = "",
-  GOOGLE_SHEET_ID,
+  GOOGLE_SHEET_ID = "",
   WORKSHEET_NAME,
   ACCOUNTS_TO_SCRAPE = "",
 } = process.env;
@@ -31,7 +31,8 @@ export const scrapeStartDate = subDays(Date.now(), Number(daysBackToScrape));
 
 export const accounts = parseAccounts(ACCOUNTS_JSON).filter(
   (account) =>
-    accountsToScrape.length == 0 || accountsToScrape.includes(account.companyId)
+    accountsToScrape.length == 0 ||
+    accountsToScrape.includes(account.companyId),
 );
 
 export const FileHeaders = [
