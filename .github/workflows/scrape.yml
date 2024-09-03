@@ -86,4 +86,3 @@ jobs:
           TRANSACTION_HASH_TYPE: ${{ secrets.TRANSACTION_HASH_TYPE }}
           WEB_POST_URL: ${{ secrets.WEB_POST_URL }}
           HIDDEN_DEPRECATIONS: true
-          
