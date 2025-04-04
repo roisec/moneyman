@@ -5,6 +5,10 @@ import { createLogger } from "./utils/logger.js";
 import { RunnerHooks } from "./types.js";
 import { runWithStorage } from "./bot/index.js";
 import { sendFailureScreenShots } from "./utils/failureScreenshot.js";
+import {
+  monitorNodeConnections,
+  reportUsedDomains,
+} from "./security/domains.js";
 
 const logger = createLogger("main");
 
@@ -15,6 +19,7 @@ Caught exception: ${err}
 Exception origin: ${origin}`).catch((e) => {});
 });
 
+monitorNodeConnections();
 await run();
 
 // kill internal browsers if stuck
@@ -43,6 +48,11 @@ async function runScraper(hooks: RunnerHooks) {
     await sendFailureScreenShots((photoPath, caption) => {
       logger("Sending failure screenshot", { photoPath, caption });
       return hooks.failureScreenshotHandler(photoPath, caption);
+    });
+
+    await reportUsedDomains((domainsByCompany) => {
+      logger("Reporting used domains", domainsByCompany);
+      return hooks.reportUsedDomains(domainsByCompany);
     });
   } catch (e) {
     logger("Error", e);
