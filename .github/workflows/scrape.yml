@@ -74,6 +74,7 @@ jobs:
           -e DOMAIN_TRACKING_ENABLED
           -e FIREWALL_SETTINGS
           -e BLOCK_BY_DEFAULT
+          -e FUTURE_MONTHS
           ${{ steps.set-container-image.outputs.image }}
         env:
           DEBUG: ""
@@ -106,3 +107,4 @@ jobs:
           DOMAIN_TRACKING_ENABLED: ${{ vars.DOMAIN_TRACKING_ENABLED }}
           FIREWALL_SETTINGS: ${{ secrets.FIREWALL_SETTINGS }}
           BLOCK_BY_DEFAULT: ${{ vars.BLOCK_BY_DEFAULT }}
+          FUTURE_MONTHS: ${{ secrets.FUTURE_MONTHS }}
