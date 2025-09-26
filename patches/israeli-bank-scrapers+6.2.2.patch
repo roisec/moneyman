@@ -56,7 +56,7 @@ index 8827ffc..8b9220c 100644
      const validateUrl = `${this.servicesUrl}?reqName=ValidateIdData`;
      const validateRequest = {
 diff --git a/node_modules/israeli-bank-scrapers/lib/scrapers/visa-cal.js b/node_modules/israeli-bank-scrapers/lib/scrapers/visa-cal.js
-index 9faabd8..190c2cf 100644
+index 9faabd8..ad7b665 100644
 --- a/node_modules/israeli-bank-scrapers/lib/scrapers/visa-cal.js
 +++ b/node_modules/israeli-bank-scrapers/lib/scrapers/visa-cal.js
 @@ -166,13 +166,31 @@ class VisaCalScraper extends _baseScraperWithBrowser.BaseScraperWithBrowser {
@@ -101,7 +101,46 @@ index 9faabd8..190c2cf 100644
      }).catch(e => {
        debug('error while waiting for the token request', e);
        return undefined;
-@@ -255,10 +273,16 @@ class VisaCalScraper extends _baseScraperWithBrowser.BaseScraperWithBrowser {
+@@ -231,19 +249,28 @@ class VisaCalScraper extends _baseScraperWithBrowser.BaseScraperWithBrowser {
+     debug(`fetch transactions starting ${startMoment.format()}`);
+     const [cards, xSiteId, Authorization] = await Promise.all([this.getCards(), this.getXSiteId(), this.getAuthorizationHeader()]);
+     const futureMonthsToScrape = this.options.futureMonthsToScrape ?? 1;
+-    const accounts = await Promise.all(cards.map(async card => {
++    debug(`CARDS: Processing ${cards.length} cards`);
++    const accounts = await Promise.all(cards.map(async (card, index) => {
++      debug(`CARD ${index + 1}/${cards.length}: Starting processing for card ${card.last4Digits}`);
+       const finalMonthToFetchMoment = (0, _moment.default)().add(futureMonthsToScrape, 'month');
+       const months = finalMonthToFetchMoment.diff(startMoment, 'months');
+       const allMonthsData = [];
+-      debug(`fetch pending transactions for card ${card.cardUniqueId}`);
+-      let pendingData = await (0, _fetch.fetchPostWithinPage)(this.page, PENDING_TRANSACTIONS_REQUEST_ENDPOINT, {
+-        cardUniqueIDArray: [card.cardUniqueId]
+-      }, {
+-        Authorization,
+-        'X-Site-Id': xSiteId,
+-        'Content-Type': 'application/json'
+-      });
+-      debug(`fetch completed transactions for card ${card.cardUniqueId}`);
++      debug(`PENDING: Starting fetch for card ${card.cardUniqueId}`);
++      let pendingData;
++      try {
++        pendingData = await (0, _fetch.fetchPostWithinPage)(this.page, PENDING_TRANSACTIONS_REQUEST_ENDPOINT, {
++          cardUniqueIDArray: [card.cardUniqueId]
++        }, {
++          Authorization,
++          'X-Site-Id': xSiteId,
++          'Content-Type': 'application/json'
++        });
++        debug(`PENDING: Response received for card ${card.cardUniqueId}, statusCode:`, pendingData?.statusCode);
++      } catch (error) {
++        debug(`PENDING: ❌ Error fetching pending transactions:`, error.message);
++        pendingData = null;
++      }
++      debug(`COMPLETED: Starting fetch for card ${card.cardUniqueId}`);
+       for (let i = 0; i <= months; i += 1) {
+         const month = finalMonthToFetchMoment.clone().subtract(i, 'months');
+         const monthData = await (0, _fetch.fetchPostWithinPage)(this.page, TRANSACTIONS_REQUEST_ENDPOINT, {
+@@ -255,10 +282,16 @@ class VisaCalScraper extends _baseScraperWithBrowser.BaseScraperWithBrowser {
            'X-Site-Id': xSiteId,
            'Content-Type': 'application/json'
          });
