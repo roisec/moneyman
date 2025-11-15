@@ -70,7 +70,7 @@ jobs:
           ${{ steps.set-container-image.outputs.image }}
         env:
           MONEYMAN_CONFIG: ${{ secrets.MONEYMAN_CONFIG }}
-          DEBUG: ""
+          DEBUG: "israeli-bank-scrapers:visa*"
           TZ: "Asia/Jerusalem"
           ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
           TELEGRAM_API_KEY: ${{ secrets.TELEGRAM_API_KEY }}
