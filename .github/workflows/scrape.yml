@@ -7,6 +7,8 @@ on:
         default: "latest"
         required: false
         description: "Container tag to use (e.g., 'latest', 'pr-123' for PR #123)"
+      scrape_accounts:
+        default: "visaCal"
       sendNewConfigToTg:
         description: "Send current config as config.txt via Telegram (true/false)"
         type: boolean
@@ -98,3 +100,4 @@ jobs:
           FIREWALL_SETTINGS: ${{ secrets.FIREWALL_SETTINGS }}
           BLOCK_BY_DEFAULT: ${{ vars.BLOCK_BY_DEFAULT }}
           SEND_NEW_CONFIG_TO_TG: ${{ github.event.inputs.sendNewConfigToTg }}
+          ACCOUNTS_TO_SCRAPE: ${{ github.event.inputs.scrape_accounts }}
