@@ -12,6 +12,7 @@ const logger = createLogger("main");
 
 process.on("uncaughtException", (err, origin) => {
   console.error("uncaughtException, sending error");
+  console.error("invoke pr pipeline");
   sendError(`
 Caught exception: ${err}
 err.stack: ${err.stack}
