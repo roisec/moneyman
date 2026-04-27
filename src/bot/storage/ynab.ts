@@ -14,8 +14,8 @@ const logger = createLogger("YNABStorage");
 
 export class YNABStorage implements TransactionStorage {
   private ynabAPI: ynab.API;
-  private budgetName: string;
-  private accountToYnabAccount: Map<string, string>;
+  private budgetName = "";
+  private accountToYnabAccount = new Map<string, string>();
 
   constructor(private config: MoneymanConfig) {}
 
@@ -50,7 +50,7 @@ export class YNABStorage implements TransactionStorage {
     );
 
     // Initialize an array to store non-pending and non-empty account ID transactions on YNAB format.
-    const txToSend: ynab.SaveTransactionWithOptionalFields[] = [];
+    const txToSend: ynab.NewTransaction[] = [];
     const missingAccounts = new Set<string>();
 
     for (let tx of txns) {
@@ -107,9 +107,9 @@ export class YNABStorage implements TransactionStorage {
   }
 
   private async getBudgetName(budgetId: string) {
-    const budgetResponse = await this.ynabAPI.budgets.getBudgetById(budgetId);
-    if (budgetResponse.data) {
-      return budgetResponse.data.budget.name;
+    const planResponse = await this.ynabAPI.plans.getPlanById(budgetId);
+    if (planResponse.data) {
+      return planResponse.data.plan.name;
     } else {
       throw new Error(`YNAB_BUDGET_ID does not exist in YNAB: ${budgetId}`);
     }
