@@ -96,6 +96,7 @@ export const scraperConfig: ScraperConfig = {
   accounts: getAccounts(),
   startDate: subDays(Date.now(), config.options.scraping.daysBack),
   parallelScrapers: config.options.scraping.maxParallelScrapers,
+  maxParallelIsracard: config.options.scraping.maxParallelIsracard,
   futureMonthsToScrape: config.options.scraping.futureMonths,
   additionalTransactionInformation:
     config.options.scraping.additionalTransactionInfo,

@@ -173,6 +173,12 @@ options: {
      */
     maxParallelScrapers?: number;
     /**
+     * The maximum number of isracard/amex scrapers to run in parallel.
+     * They share a rate-limited backend, so lower this if you hit rate limits.
+     * @default 1
+     */
+    maxParallelIsracard?: number;
+    /**
      * Enable tracking of all domains accessed during scraping
      * @default false
      */
