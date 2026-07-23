@@ -5,10 +5,31 @@ import { createLogger } from "../utils/logger.js";
 import { loggerContextStore } from "../utils/asyncContext.js";
 import { createBrowser, createSecureBrowserContext } from "./browser.js";
 import { getFailureScreenShotPath } from "../utils/failureScreenshot.js";
-import { ScraperOptions } from "israeli-bank-scrapers";
+import { CompanyTypes, ScraperOptions } from "israeli-bank-scrapers";
 import { parallelLimit } from "async";
 
 const logger = createLogger("scraper");
+
+// Counting semaphore to cap how many tasks run concurrently
+function createConcurrencyLimit(max: number) {
+  let active = 0;
+  const waiting: Array<() => void> = [];
+  const release = () => {
+    active--;
+    waiting.shift()?.();
+  };
+  return async function run<T>(fn: () => Promise<T>): Promise<T> {
+    if (active >= max) {
+      await new Promise<void>((resolve) => waiting.push(resolve));
+    }
+    active++;
+    try {
+      return await fn();
+    } finally {
+      release();
+    }
+  };
+}
 
 export const scraperOptions: Partial<ScraperOptions> = {
   navigationRetryCount: 3,
@@ -27,6 +48,7 @@ export async function scrapeAccounts(
     startDate,
     futureMonthsToScrape,
     parallelScrapers,
+    maxParallelIsracard,
     additionalTransactionInformation,
     includeRawTransaction,
   }: ScraperConfig,
@@ -53,12 +75,14 @@ export async function scrapeAccounts(
   const browser = await createBrowser();
   logger(`Browser created, starting to scrape ${accounts.length} accounts`);
 
+  // Cap concurrent isracard/amex scrapers (they share a rate-limited backend)
+  const withIsracardLimit = createConcurrencyLimit(maxParallelIsracard);
+
   const results = await parallelLimit<AccountConfig, AccountScrapeResult[]>(
     accounts.map((account, i) => async () => {
       const { companyId } = account;
-      return loggerContextStore.run(
-        { prefix: `[#${i} ${companyId}]` },
-        async () =>
+      const run = () =>
+        loggerContextStore.run({ prefix: `[#${i} ${companyId}]` }, async () =>
           scrapeAccount(
             account,
             {
@@ -80,7 +104,15 @@ export async function scrapeAccounts(
               return scrapeStatusChanged?.(status);
             },
           ),
-      );
+        );
+
+      if (
+        companyId === CompanyTypes.isracard ||
+        companyId === CompanyTypes.amex
+      ) {
+        return withIsracardLimit(run);
+      }
+      return run();
     }),
     Number(parallelScrapers),
   );
