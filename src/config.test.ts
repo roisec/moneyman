@@ -24,6 +24,7 @@ describe("config", () => {
     expect(parsed.accounts).toEqual([]);
     expect(parsed.storage.localJson?.enabled).toBe(true);
     expect(parsed.options.scraping.daysBack).toBe(10);
+    expect(parsed.options.scraping.maxParallelIsracard).toBe(1);
     expect(parsed.options.scraping.includeRawTransaction).toBe(false);
     expect(parsed.options.logging.getIpInfoUrl).toBe("https://ipinfo.io/json");
   });
@@ -528,6 +529,7 @@ describe("config", () => {
           scraping: {
             daysBack: 500, // Exceeds schema max constraint
             maxParallelScrapers: 20, // Exceeds schema max constraint
+            maxParallelIsracard: 20, // Exceeds schema max constraint
           },
           security: {},
           notifications: {},
@@ -548,6 +550,30 @@ describe("config", () => {
       expect(config.accounts).toEqual([]);
       expect(config.options.scraping.daysBack).toBe(10);
       expect(config.options.scraping.maxParallelScrapers).toBe(1);
+      expect(config.options.scraping.maxParallelIsracard).toBe(1);
+    });
+
+    it("should honor a valid maxParallelIsracard value", async () => {
+      const configJson = {
+        accounts: [{ companyId: "test", password: "pass", userCode: "12345" }],
+        storage: { localJson: { enabled: true } },
+        options: {
+          scraping: { maxParallelIsracard: 3 },
+          security: {},
+          notifications: {},
+          logging: {},
+        },
+      };
+
+      process.env = {
+        ...originalEnv,
+        MONEYMAN_CONFIG_PATH: undefined,
+        MONEYMAN_CONFIG: JSON.stringify(configJson),
+      };
+
+      const { config } = await import("./config.js");
+
+      expect(config.options.scraping.maxParallelIsracard).toBe(3);
     });
 
     it("should handle missing telegram required fields", async () => {

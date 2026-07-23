@@ -1,0 +1,13 @@
+diff --git a/node_modules/israeli-bank-scrapers/lib/scrapers/base-isracard-amex.js b/node_modules/israeli-bank-scrapers/lib/scrapers/base-isracard-amex.js
+index 8125550..787464d 100644
+--- a/node_modules/israeli-bank-scrapers/lib/scrapers/base-isracard-amex.js
++++ b/node_modules/israeli-bank-scrapers/lib/scrapers/base-isracard-amex.js
+@@ -19,7 +19,7 @@ var _baseScraperWithBrowser = require("./base-scraper-with-browser");
+ var _errors = require("./errors");
+ function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+ const RATE_LIMIT = {
+-  SLEEP_BETWEEN: 2500,
++  SLEEP_BETWEEN: 5000,
+   // Sweet spot: 2.5s base delay (randomized up to 3s)
+   TRANSACTIONS_BATCH_SIZE: 10
+ };
